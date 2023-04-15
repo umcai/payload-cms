@@ -5,9 +5,9 @@ services:
   payload:
     container_name: web-app
     restart: unless-stopped
-    # image: node:18-alpine
-    build:
-      context: .
+    image: pm2-launch-app:latest
+    # build:
+    #  context: .
     ports:
       - "3000:3000"
     volumes:
