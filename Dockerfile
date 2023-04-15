@@ -1,21 +1,27 @@
-FROM arm64v8/node:16
-# FROM keymetrics/pm2:latest-alpine
+# FROM node:18.8-alpine as base
+FROM arm64v8/node:16-alpine as base
 
-# Bundle APP files
-WORKDIR /app
+FROM base as builder
+
+WORKDIR /home/node/app
+COPY package*.json ./
+
 COPY . .
-
-# Install app dependencies
-ENV NPM_CONFIG_LOGLEVEL warn
-RUN yarn install --production
+RUN yarn install
 RUN yarn build
 
-# Expose the listening port of your app
+FROM base as runtime
+
+ENV NODE_ENV=production
+ENV PAYLOAD_CONFIG_PATH=dist/payload.config.js
+
+WORKDIR /home/node/app
+COPY package*.json  ./
+
+RUN yarn install --production
+COPY --from=builder /home/node/app/dist ./dist
+COPY --from=builder /home/node/app/build ./build
+
 EXPOSE 3000
 
-# Show current folder structure in logs
-RUN ls -al -R
-
-RUN yarn add pm2 -g
-
-CMD [ "pm2-runtime", "start", "ecosystem.config.js" ]
+CMD ["node", "dist/server.js"]
