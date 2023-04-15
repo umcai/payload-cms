@@ -1,26 +1,17 @@
-FROM node:18.8-alpine as base
+FROM keymetrics/pm2:latest-alpine
 
-FROM base as builder
-
-WORKDIR /home/node/app
-COPY package*.json ./
-
+# Bundle APP files
+WORKDIR /app
 COPY . .
-RUN yarn install
-RUN yarn build
 
-FROM base as runtime
+# Install app dependencies
+ENV NPM_CONFIG_LOGLEVEL warn
+RUN npm install --production
 
-ENV NODE_ENV=production
-ENV PAYLOAD_CONFIG_PATH=dist/payload.config.js
-
-WORKDIR /home/node/app
-COPY package*.json  ./
-
-RUN yarn install --production
-COPY --from=builder /home/node/app/dist ./dist
-COPY --from=builder /home/node/app/build ./build
-
+# Expose the listening port of your app
 EXPOSE 3000
 
-CMD ["node", "dist/server.js"]
+# Show current folder structure in logs
+RUN ls -al -R
+
+CMD [ "pm2-runtime", "start", "ecosystem.config.js" ]
