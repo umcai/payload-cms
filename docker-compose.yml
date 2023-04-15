@@ -3,15 +3,15 @@ version: '3'
 services:
 
   payload:
-    container_name: web-app
+    container_name: payload-app
     restart: unless-stopped
-    image: pm2-launch-app:latest
+    image: payload-app:latest
     # build:
     #  context: .
     ports:
       - "3000:3000"
-    volumes:
-      - .:/app
+    # volumes:
+      # - .:/app
       # - node_modules:/home/node/app/node_modules
     # working_dir: /home/node/app/
     # command: sh -c "yarn install && yarn dev"
@@ -23,7 +23,7 @@ services:
       # NODE_ENV: production
       PAYLOAD_SECRET: aedcfd54e33f1eddd1835ba4
   mongo:
-    container_name: web-db
+    container_name: payload-db
     restart: unless-stopped
     image: mongo:latest
     ports:

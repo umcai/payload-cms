@@ -1,4 +1,4 @@
-FROM arm64v8/node:16-alpine
+FROM arm64v8/node:16
 # FROM keymetrics/pm2:latest-alpine
 
 # Bundle APP files
@@ -7,7 +7,8 @@ COPY . .
 
 # Install app dependencies
 ENV NPM_CONFIG_LOGLEVEL warn
-RUN npm install --production
+RUN yarn install --production
+RUN yarn build
 
 # Expose the listening port of your app
 EXPOSE 3000
@@ -15,6 +16,6 @@ EXPOSE 3000
 # Show current folder structure in logs
 RUN ls -al -R
 
-RUN npm install pm2 -g
+RUN yarn add pm2 -g
 
 CMD [ "pm2-runtime", "start", "ecosystem.config.js" ]
